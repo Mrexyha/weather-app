@@ -1,3 +1,5 @@
+import conditions from "./conditions.js";
+
 const apiKey = "cc285e1ea4fb402fa4f134026240705";
 
 const header = document.querySelector(".header");
@@ -14,13 +16,13 @@ const showError = (erroeMessage) => {
   header.insertAdjacentHTML("afterend", html);
 };
 
-const showCard = ({ name, country, temp, condition }) => {
+const showCard = ({ name, country, temp, condition, imgPath }) => {
   const html = `<div class="card">
                       <div class="card-city">${name} <span>${country}</span></div>
 
                       <div class="card-weather">
                           <div class="card-value">${temp}<sup>°c</sup></div>
-                          <img class="card-image" src="./img/sun/8.png" alt="Weather">
+                          <img class="card-image" src="${imgPath}" alt="Weather">
                       </div>
 
                       <div class="card-desc">${condition}</div>
@@ -52,11 +54,21 @@ form.onsubmit = async function (e) {
   } else {
     removeCard();
 
+    const info = conditions.find(
+      (obj) => obj.code === data.current.condition.code
+    );
+
+    const filePath = "./img/" + (data.current.is_day ? "day" : "night") + "/";
+    const fileName = (data.current.is_day ? info.day : info.night) + ".png";
+
     const weatherData = {
       name: data.location.name,
       country: data.location.country,
       temp: data.current.temp_c,
-      condition: data.current.condition.text,
+      condition: data.current.is_day
+        ? info.languages[32].day_text
+        : info.languages[32].night_text,
+      imgPath: filePath + fileName,
     };
 
     showCard(weatherData);
